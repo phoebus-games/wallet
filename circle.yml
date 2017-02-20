@@ -1,0 +1,17 @@
+machine:
+  java:
+    version: oraclejdk8
+test:
+  override:
+    - mvn verify -Dspring.data.mongodb.write-concern=ACKNOWLEDGED
+  post:
+    - mkdir -p $CIRCLE_TEST_REPORTS/junit/
+    - find . -type f -regex ".*/target/surefire-reports/.*xml" -exec cp {} $CIRCLE_TEST_REPORTS/junit/ \;
+    - find . -type f -regex ".*/target/failsafe-reports/.*xml" -exec cp {} $CIRCLE_TEST_REPORTS/junit/ \;
+deployment:
+  prod:
+    branch: master
+    commands:
+      - mvn package -Pexecutable
+      - ./deploy.sh
+      - "curl -u $CIRCLE_TOKEN: -X POST https://circleci.com/api/v1.1/proj/github/helios-games/smoke/tree/master"
