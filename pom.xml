@@ -40,8 +40,8 @@
                             <targetTests>
                                 <targetTests>wallet.model.*</targetTests>
                             </targetTests>
-                            <coverageThreshold>99</coverageThreshold>
-                            <mutationThreshold>67</mutationThreshold>
+                            <coverageThreshold>100</coverageThreshold>
+                            <mutationThreshold>100</mutationThreshold>
                         </configuration>
                     </execution>
                 </executions>

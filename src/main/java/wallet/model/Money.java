@@ -10,7 +10,7 @@ public class Money {
     private final BigDecimal amount;
 
     public Money(BigDecimal amount) {
-        int scale = amount.stripTrailingZeros().scale();
+        int scale = amount.scale();
         if (scale > 2) {
             throw new IllegalArgumentException("amount + " +amount + " has scale "  +scale + ",  > 2 ");
         }
@@ -23,6 +23,10 @@ public class Money {
 
     public Money(String amount) {
         this(new BigDecimal(amount));
+    }
+
+    public BigDecimal getAmount() {
+        return amount;
     }
 
     @Override

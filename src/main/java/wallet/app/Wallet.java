@@ -5,7 +5,7 @@ import lombok.Value;
 import wallet.model.Money;
 
 @Value
-class Wallet {
+public class Wallet {
     @NonNull
     private final Money balance;
 }
