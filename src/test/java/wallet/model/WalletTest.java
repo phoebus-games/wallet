@@ -1,4 +1,4 @@
-import static org.junit.Assert.*;
+package wallet.model;
 
 public class WalletTest {
 

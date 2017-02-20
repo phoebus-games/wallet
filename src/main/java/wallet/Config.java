@@ -4,8 +4,10 @@ import org.springframework.boot.autoconfigure.context.PropertyPlaceholderAutoCon
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
 import org.springframework.boot.autoconfigure.web.*;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import wallet.app.WalletController;
 
 @Configuration
 @Import({
@@ -22,4 +24,8 @@ import org.springframework.context.annotation.Import;
 }
 )
 class Config {
+    @Bean
+    public WalletController walletController() {
+        return new WalletController();
+    }
 }
