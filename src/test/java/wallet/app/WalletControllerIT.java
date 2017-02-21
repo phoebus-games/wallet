@@ -1,12 +1,10 @@
 package wallet.app;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.core.IsEqual.equalTo;
 
-@Ignore
 public class WalletControllerIT extends IntegrationTest {
 
     @Test
@@ -18,5 +16,15 @@ public class WalletControllerIT extends IntegrationTest {
                 .statusCode(200)
                 .body("balance", equalTo("1000"));
 
+    }
+
+    @Test
+    public void createTransaction() throws Exception {
+        given()
+                .param("amount", 10)
+                .when()
+                .post("/transactions")
+                .then()
+                .statusCode(201);
     }
 }
