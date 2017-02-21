@@ -1,13 +1,15 @@
 package wallet.model;
 
 import java.math.BigDecimal;
-import java.util.Objects;
 
 public class Wallet {
     private BigDecimal balance;
 
     public Wallet(BigDecimal balance) {
-        this.balance = Objects.requireNonNull(balance);
+        if (balance == null) {
+            throw new IllegalArgumentException();
+        }
+        this.balance = balance;
     }
 
     public void createTransaction(BigDecimal amount) {
