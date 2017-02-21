@@ -11,26 +11,7 @@ import java.math.BigDecimal;
 @RequestMapping("/")
 public class WalletController {
 
-    @Data
-    public static class WalletDao {
-        private BigDecimal balance;
-
-        @SuppressWarnings("unused")
-        public WalletDao() {
-        }
-
-        WalletDao(BigDecimal balance) {
-            this.balance = balance;
-        }
-    }
-
-    @SuppressWarnings("WeakerAccess")
-    @Data
-    public static class TransactionDao {
-        private BigDecimal amount;
-    }
-
-    private final Wallet wallet = new Wallet(new BigDecimal(0));
+    private final Wallet wallet = new Wallet(new BigDecimal(1000));
 
     @PutMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -48,5 +29,24 @@ public class WalletController {
     public WalletDao createTransaction(@RequestBody TransactionDao transaction) {
         wallet.createTransaction(transaction.getAmount());
         return get();
+    }
+
+    @Data
+    public static class WalletDao {
+        private BigDecimal balance;
+
+        @SuppressWarnings("unused")
+        public WalletDao() {
+        }
+
+        WalletDao(BigDecimal balance) {
+            this.balance = balance;
+        }
+    }
+
+    @SuppressWarnings("WeakerAccess")
+    @Data
+    public static class TransactionDao {
+        private BigDecimal amount;
     }
 }
