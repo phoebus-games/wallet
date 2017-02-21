@@ -1,5 +1,6 @@
 package wallet.app;
 
+import io.restassured.http.ContentType;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -12,7 +13,8 @@ public class WalletControllerIT extends IntegrationTest {
     public void setUp() throws Exception {
         super.setUp();
         given()
-                .param("amount", "1000")
+                .contentType(ContentType.JSON)
+                .body("{\"balance\": 1000}")
                 .when()
                 .put()
                 .then()
@@ -33,10 +35,12 @@ public class WalletControllerIT extends IntegrationTest {
     @Test
     public void createTransaction() throws Exception {
         given()
-                .param("amount", 10)
+                .contentType(ContentType.JSON)
+                .body("{\"amount\": 200}")
                 .when()
                 .post("/transactions")
                 .then()
-                .statusCode(201);
+                .statusCode(201)
+                .body("balance", equalTo(800));
     }
 }

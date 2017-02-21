@@ -16,6 +16,7 @@ public class Wallet {
         balance = balance.subtract(amount);
     }
 
+    @SuppressWarnings("WeakerAccess")
     public BigDecimal getBalance() {
         return balance;
     }

@@ -1,5 +1,6 @@
 package wallet.app;
 
+import lombok.Data;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import wallet.model.Wallet;
@@ -10,22 +11,42 @@ import java.math.BigDecimal;
 @RequestMapping("/")
 public class WalletController {
 
-    private final Wallet wallet = new Wallet(new BigDecimal(1000));
+    @Data
+    public static class WalletDao {
+        private BigDecimal balance;
+
+        @SuppressWarnings("unused")
+        public WalletDao() {
+        }
+
+        WalletDao(BigDecimal balance) {
+            this.balance = balance;
+        }
+    }
+
+    @SuppressWarnings("WeakerAccess")
+    @Data
+    public static class TransactionDao {
+        private BigDecimal amount;
+    }
+
+    private final Wallet wallet = new Wallet(new BigDecimal(0));
 
     @PutMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void put(@RequestParam("amount") BigDecimal amount) {
-        wallet.setBalance(amount);
+    public void put(@RequestBody WalletDao wallet) {
+        this.wallet.setBalance(wallet.getBalance());
     }
 
     @GetMapping
-    public Wallet get() {
-        return wallet;
+    public WalletDao get() {
+        return new WalletDao(wallet.getBalance());
     }
 
     @PostMapping("/transactions")
     @ResponseStatus(HttpStatus.CREATED)
-    public void createTransaction(@RequestParam("amount") BigDecimal amount) {
-        wallet.createTransaction(amount);
+    public WalletDao createTransaction(@RequestBody TransactionDao transaction) {
+        wallet.createTransaction(transaction.getAmount());
+        return get();
     }
 }
