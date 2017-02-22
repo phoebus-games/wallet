@@ -12,6 +12,12 @@ test:
     - find . -type f -regex ".*/target/failsafe-reports/.*xml" -exec cp {} $CIRCLE_TEST_REPORTS/junit/ \;
 deployment:
   prod:
+    branch: docker
+      - mvn spring-boot:package -Pexecutable
+      - docker build -t alexec/wallet:1.0.0 .
+      - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD -e $DOCKER_EMAIL
+      - docker push alexec/wallet:1.0.0
+    commands:
     branch: master
     commands:
       - mvn package -Pexecutable
