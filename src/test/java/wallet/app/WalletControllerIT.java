@@ -4,8 +4,6 @@ import io.restassured.http.ContentType;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.math.BigDecimal;
-
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.core.IsEqual.equalTo;
 
@@ -34,7 +32,7 @@ public class WalletControllerIT extends IntegrationTest {
                 .get("/" + id)
                 .then()
                 .statusCode(200)
-                .body("balance", equalTo(new BigDecimal("0.0000")));
+                .body("balance", equalTo(0.0f));
 
     }
 
@@ -47,6 +45,6 @@ public class WalletControllerIT extends IntegrationTest {
                 .post("/" + id + "/transactions")
                 .then()
                 .statusCode(201)
-                .body("balance", equalTo(new BigDecimal("200.0000")));
+                .body("balance", equalTo(200.0f));
     }
 }

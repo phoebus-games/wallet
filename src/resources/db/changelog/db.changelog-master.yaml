@@ -20,3 +20,9 @@ databaseChangeLog:
                   constraints:
                     minimumn: 0
                     nullable: false
+  - changeSet:
+      id: 2
+      author: alex.e.c
+      changes:
+        - sql:
+            sql: insert into wallet (id) values (0)
