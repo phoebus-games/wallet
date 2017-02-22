@@ -11,13 +11,14 @@ test:
     - find . -type f -regex ".*/target/surefire-reports/.*xml" -exec cp {} $CIRCLE_TEST_REPORTS/junit/ \;
     - find . -type f -regex ".*/target/failsafe-reports/.*xml" -exec cp {} $CIRCLE_TEST_REPORTS/junit/ \;
 deployment:
-  prod:
+  stage:
     branch: docker
+    commands:
       - mvn spring-boot:package -Pexecutable
       - docker build -t alexec/wallet:1.0.0 .
       - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD -e $DOCKER_EMAIL
       - docker push alexec/wallet:1.0.0
-    commands:
+  prod:
     branch: master
     commands:
       - mvn package -Pexecutable
