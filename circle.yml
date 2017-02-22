@@ -14,7 +14,7 @@ deployment:
   stage:
     branch: docker
     commands:
-      - mvn spring-boot:package -Pexecutable
+      - mvn spring-boot:repackage -Pexecutable
       - docker build -t alexec/wallet:1.0.0 .
       - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD -e $DOCKER_EMAIL
       - docker push alexec/wallet:1.0.0
