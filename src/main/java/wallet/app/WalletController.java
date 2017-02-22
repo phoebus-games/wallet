@@ -1,52 +1,47 @@
 package wallet.app;
 
-import lombok.Data;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import wallet.infra.WalletRepo;
+import wallet.model.Transaction;
 import wallet.model.Wallet;
 
-import java.math.BigDecimal;
+import java.net.URI;
 
 @RestController
 @RequestMapping("/")
 public class WalletController {
 
-    private final Wallet wallet = new Wallet(new BigDecimal(1000));
+    private final WalletRepo repo;
 
-    @PutMapping
+    public WalletController(WalletRepo repo) {
+        this.repo = repo;
+    }
+
+    @PostMapping
+    public ResponseEntity<Wallet> createWallet() {
+        long id = repo.create();
+        return ResponseEntity.created(URI.create(String.valueOf(id))).body(new Wallet());
+    }
+
+    @PutMapping("{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void put(@RequestBody WalletDao wallet) {
-        this.wallet.setBalance(wallet.getBalance());
+    public void updateWallet(@PathVariable("id") long id, @RequestBody Wallet wallet) {
+        repo.save(id, wallet);
     }
 
-    @GetMapping
-    public WalletDao get() {
-        return new WalletDao(wallet.getBalance());
+    @GetMapping("{id}")
+    public Wallet getWallet(@PathVariable("id") long id) {
+        return repo.findOne(id);
     }
 
-    @PostMapping("/transactions")
+    @PostMapping("{id}/transactions")
     @ResponseStatus(HttpStatus.CREATED)
-    public WalletDao createTransaction(@RequestBody TransactionDao transaction) {
-        wallet.createTransaction(transaction.getAmount());
-        return get();
-    }
-
-    @Data
-    public static class WalletDao {
-        private BigDecimal balance;
-
-        @SuppressWarnings("unused")
-        public WalletDao() {
-        }
-
-        WalletDao(BigDecimal balance) {
-            this.balance = balance;
-        }
-    }
-
-    @SuppressWarnings("WeakerAccess")
-    @Data
-    public static class TransactionDao {
-        private BigDecimal amount;
+    public Wallet createTransaction(@PathVariable("id") long id, @RequestBody Transaction transaction) {
+        Wallet wallet = getWallet(id);
+        wallet.incrementBalance(transaction.getAmount());
+        repo.save(id, wallet);
+        return wallet;
     }
 }

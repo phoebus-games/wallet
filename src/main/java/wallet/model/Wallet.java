@@ -1,27 +1,14 @@
 package wallet.model;
 
+import lombok.Data;
+
 import java.math.BigDecimal;
 
+@Data
 public class Wallet {
-    private BigDecimal balance;
+    private BigDecimal balance = BigDecimal.ZERO;
 
-    public Wallet(BigDecimal balance) {
-        if (balance == null) {
-            throw new IllegalArgumentException();
-        }
-        this.balance = balance;
-    }
-
-    public void createTransaction(BigDecimal amount) {
-        balance = balance.subtract(amount);
-    }
-
-    @SuppressWarnings("WeakerAccess")
-    public BigDecimal getBalance() {
-        return balance;
-    }
-
-    public void setBalance(BigDecimal balance) {
-        this.balance = balance;
+    public void incrementBalance(BigDecimal amount) {
+        balance = balance.add(amount);
     }
 }
