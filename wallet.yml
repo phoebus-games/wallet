@@ -1,3 +1,17 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: wallet
+  labels:
+    app: wallet
+spec:
+  ports:
+  - port: 8080
+    name: wallet
+  selector:
+    app: wallet
+---
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
@@ -13,8 +27,10 @@ spec:
       - name: wallet
         image: alexec/wallet:1.0.0
         env:
+          - name: JAVA_OPTS
+            value: -Xmx64m
           - name: SPRING_DATASOURCE_URL
-            value: jdbc:postgresql://postgres:5432/wallet
+            value: jdbc:postgresql://walletdb:5432/wallet
           - name: SPRING_DATASOURCE_USERNAME
             value: wallet
           - name: SPRING_DATASOURCE_PASSWORD
