@@ -1,0 +1,29 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: wallet-deployment
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: wallet
+    spec:
+      containers:
+      - name: wallet
+        image: alexec/wallet:1.0.0
+        env:
+          - name: SPRING_DATASOURCE_URL
+            value: jdbc:postgresql://postgres:5432/wallet
+          - name: SPRING_DATASOURCE_USERNAME
+            value: wallet
+          - name: SPRING_DATASOURCE_PASSWORD
+            value: wallet
+        ports:
+        - containerPort: 8080
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 90
+          periodSeconds: 3
