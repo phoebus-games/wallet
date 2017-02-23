@@ -17,9 +17,9 @@ deployment:
     branch: master
     commands:
       - mvn package spring-boot:repackage
-      - docker build --rm=false -t alexec/wallet:1.0.0 .
+      - docker build --rm=false -t alexec/wallet:1.0.0 -t alexec/wallet:latest .
       - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
-      - docker push alexec/wallet:1.0.0
+      - docker push alexec/wallet
   prod:
     branch: master
     commands:
