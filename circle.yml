@@ -1,8 +1,6 @@
 machine:
   java:
-    version: oraclejdk8
-  services:
-    - docker
+    version: openjdk8
 test:
   pre:
     - createdb wallet
