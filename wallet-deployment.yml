@@ -23,7 +23,7 @@ spec:
         - containerPort: 8080
         livenessProbe:
           httpGet:
-            path: /
+            path: /0
             port: 8080
-          initialDelaySeconds: 90
+          initialDelaySeconds: 15
           periodSeconds: 3
