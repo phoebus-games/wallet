@@ -11,6 +11,6 @@ spec:
     spec:
       containers:
       - name: wallet
-        image: alexec/wallet:1.0.0.
+        image: alexec/wallet:1.0.0
         ports:
         - containerPort: 8080
