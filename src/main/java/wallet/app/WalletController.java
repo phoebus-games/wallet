@@ -1,5 +1,6 @@
 package wallet.app;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -41,7 +42,20 @@ public class WalletController {
     public Wallet createTransaction(@PathVariable("id") long id, @RequestBody Transaction transaction) {
         Wallet wallet = getWallet(id);
         wallet.incrementBalance(transaction.getAmount());
-        repo.save(id, wallet);
+        try {
+            repo.save(id, wallet);
+        } catch (DataIntegrityViolationException e) {
+            if (e.getMessage().contains("chk_balance")) {
+                throw new NotEnoughFundsException();
+            } else {
+                throw e;
+            }
+        }
         return wallet;
+    }
+
+    @ResponseStatus(value = HttpStatus.FORBIDDEN, reason = "not enough funds")
+    public static class NotEnoughFundsException extends RuntimeException {
+
     }
 }

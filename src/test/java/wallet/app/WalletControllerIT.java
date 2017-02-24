@@ -33,7 +33,6 @@ public class WalletControllerIT extends IntegrationTest {
                 .then()
                 .statusCode(200)
                 .body("balance", equalTo(0.0f));
-
     }
 
     @Test
@@ -46,5 +45,17 @@ public class WalletControllerIT extends IntegrationTest {
                 .then()
                 .statusCode(201)
                 .body("balance", equalTo(200.0f));
+    }
+
+    @Test
+    public void cannotHaveBalanceBelowZero() throws Exception {
+        given()
+                .contentType(ContentType.JSON)
+                .body("{\"amount\": -200}")
+                .when()
+                .post("/" + id + "/transactions")
+                .then()
+                .statusCode(403)
+                .body("message", equalTo("not enough funds"));
     }
 }
