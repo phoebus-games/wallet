@@ -27,8 +27,8 @@ spec:
       - name: wallet
         image: alexec/wallet:latest
         env:
-          - name: JAVA_OPTS
-            value: -Xmx64m
+          #- name: JAVA_OPTS
+          #  value: -Xmx64m
           - name: SPRING_DATASOURCE_URL
             value: jdbc:postgresql://walletdb:5432/wallet
           - name: SPRING_DATASOURCE_USERNAME
@@ -41,5 +41,5 @@ spec:
           httpGet:
             path: /0
             port: 8080
-          initialDelaySeconds: 90
+          initialDelaySeconds: 180
           periodSeconds: 3
