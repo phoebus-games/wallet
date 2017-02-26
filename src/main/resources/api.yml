@@ -1,0 +1,99 @@
+---
+swagger: '2.0'
+info:
+  version: 1.0.0
+  title: Wallet API
+consumes:
+- application/json
+produces:
+- application/json
+paths:
+  /:
+    post:
+      summary: Create a new wallet
+      operationId: createWallet
+      responses:
+        201:
+          description: Created
+          headers:
+            Location:
+              type: string
+              description: Wallet location
+          schema:
+            $ref: "#/definitions/wallet"
+  /{id}:
+    parameters:
+    - name: id
+      in: path
+      type: integer
+      format: int64
+      required: true
+    get:
+      summary: Get a wallet
+      operationId: getWallet
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: "#/definitions/wallet"
+    put:
+      summary: Set a wallet balance
+      operationId: updateWallet
+      parameters:
+      - name: wallet
+        in: body
+        schema:
+          $ref: "#/definitions/wallet"
+        required: true
+      responses:
+        204:
+          description: OK
+  /{id}/transactions:
+    parameters:
+    - name: id
+      in: path
+      type: integer
+      format: int64
+      required: true
+    post:
+      summary: Create transaction
+      operationId: createTransaction
+      parameters:
+      - name: transaction
+        in: body
+        schema:
+          $ref: "#/definitions/transaction"
+        required: true
+      responses:
+        201:
+          description: Created
+          schema:
+            $ref: "#/definitions/wallet"
+        403:
+          description: Not enough funds
+          schema:
+            $ref: "#/definitions/error"
+          examples:
+            application/json:
+              message: Not enough funds
+definitions:
+  error:
+    properties:
+      message:
+        type: string
+    required:
+    - message
+  wallet:
+    properties:
+      balance:
+        type: number
+        multipleOf: 0.01
+    required:
+    - balance
+  transaction:
+    properties:
+      amount:
+        type: number
+        multipleOf: 0.01
+    required:
+    - amount
