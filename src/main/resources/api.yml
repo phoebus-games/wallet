@@ -3,15 +3,13 @@ swagger: '2.0'
 info:
   version: 1.0.0
   title: Wallet API
-consumes:
-- application/json
-produces:
-- application/json
 paths:
   /:
     post:
       summary: Create a new wallet
       operationId: createWallet
+      produces:
+      - application/json
       responses:
         201:
           description: Created
@@ -31,6 +29,8 @@ paths:
     get:
       summary: Get a wallet
       operationId: getWallet
+      produces:
+      - application/json
       responses:
         200:
           description: OK
@@ -39,6 +39,8 @@ paths:
     put:
       summary: Set a wallet balance
       operationId: updateWallet
+      consumes:
+      - application/json
       parameters:
       - name: wallet
         in: body
@@ -58,6 +60,10 @@ paths:
     post:
       summary: Create transaction
       operationId: createTransaction
+      consumes:
+      - application/json
+      produces:
+      - application/json
       parameters:
       - name: transaction
         in: body

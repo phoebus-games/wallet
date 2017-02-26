@@ -28,7 +28,6 @@ public class WalletControllerIT extends IntegrationTest {
     @Test
     public void canGetWallet() throws Exception {
         given()
-                .contentType(ContentType.JSON)
                 .when()
                 .get("/" + id)
                 .then()
