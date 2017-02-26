@@ -22,4 +22,4 @@ deployment:
       - docker push alexec/wallet
       - mvn clean package -Pexecutable
       - ./deploy.sh
-      - "curl -u $CIRCLE_TOKEN: -X POST https://circleci.com/api/v1.1/proj/github/phoebus-games/smoke/tree/master"
+      - "curl -f -u $CIRCLE_TOKEN: -X POST https://circleci.com/api/v1.1/project/github/phoebus-games/smoke/tree/master"
