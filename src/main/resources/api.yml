@@ -3,11 +3,16 @@ swagger: '2.0'
 info:
   version: 1.0.0
   title: Wallet API
+securityDefinitions:
+  basicAuth:
+    type: basic
 paths:
   /:
     post:
       summary: Create a new wallet
       operationId: createWallet
+      security:
+       - basicAuth: []
       produces:
       - application/json
       responses:
@@ -29,6 +34,8 @@ paths:
     get:
       summary: Get a wallet
       operationId: getWallet
+      security:
+       - basicAuth: []
       produces:
       - application/json
       responses:
@@ -39,6 +46,8 @@ paths:
     put:
       summary: Set a wallet balance
       operationId: updateWallet
+      security:
+       - basicAuth: []
       consumes:
       - application/json
       parameters:
@@ -60,6 +69,8 @@ paths:
     post:
       summary: Create transaction
       operationId: createTransaction
+      security:
+       - basicAuth: []
       consumes:
       - application/json
       produces:

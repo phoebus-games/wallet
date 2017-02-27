@@ -25,6 +25,9 @@ public class WalletControllerIT extends IntegrationTest {
                 .header("Location"));
     }
 
+    // TODO block access to transaction for web
+    // TODO block access without basic
+
     @Test
     public void canGetWallet() throws Exception {
         given()

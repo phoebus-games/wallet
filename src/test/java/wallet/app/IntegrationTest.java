@@ -23,5 +23,6 @@ abstract class IntegrationTest {
         RestAssured.reset();
         RestAssured.port = port;
         RestAssured.enableLoggingOfRequestAndResponseIfValidationFails();
+        RestAssured.basic("roulette", "roulette");
     }
 }
