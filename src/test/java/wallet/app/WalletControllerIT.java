@@ -25,7 +25,28 @@ public class WalletControllerIT extends IntegrationTest {
                 .header("Location"));
     }
 
-    // TODO block access to transaction for web
+    @Test
+    public void webCannotCreateTransaction() throws Exception {
+        given()
+                .auth().basic("web", "web")
+                .contentType(ContentType.JSON)
+                .body("{\"amount\": 200}")
+                .when()
+                .post("/" + id + "/transactions")
+                .then()
+                .statusCode(403);
+    }
+
+    @Test
+    public void webCanGetWallet() throws Exception {
+        given()
+                .auth().basic("web", "web")
+                .when()
+                .get("/" + id)
+                .then()
+                .statusCode(200);
+    }
+
     // TODO block access without basic
 
     @Test

@@ -43,22 +43,6 @@ paths:
           description: OK
           schema:
             $ref: "#/definitions/wallet"
-    put:
-      summary: Set a wallet balance
-      operationId: updateWallet
-      security:
-       - basicAuth: []
-      consumes:
-      - application/json
-      parameters:
-      - name: wallet
-        in: body
-        schema:
-          $ref: "#/definitions/wallet"
-        required: true
-      responses:
-        204:
-          description: OK
   /{id}/transactions:
     parameters:
     - name: id

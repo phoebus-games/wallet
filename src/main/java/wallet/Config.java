@@ -10,6 +10,7 @@ import org.springframework.boot.autoconfigure.web.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpMethod;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -46,12 +47,21 @@ public class Config {
     }
 
     @Bean
-    public WebSecurityConfigurerAdapter globalAuthenticationConfigurerAdapter() {
+    public WebSecurityConfigurerAdapter webSecurityConfigurerAdapter() {
         return new WebSecurityConfigurerAdapter() {
 
             @Override
             protected void configure(HttpSecurity http) throws Exception {
+                http.cors().disable();
                 http.csrf().disable();
+
+                http.httpBasic();
+
+                http.authorizeRequests()
+                        .antMatchers(HttpMethod.GET).hasAnyRole("WEB", "GAME")
+                        .antMatchers(HttpMethod.POST).hasRole("GAME")
+
+                ;
             }
 
             @Override
@@ -60,7 +70,8 @@ public class Config {
                         .inMemoryAuthentication()
                         .withUser("web").password("web").roles("WEB").and()
                         .withUser("roulette").password("roulette").roles("GAME").and()
-                        .withUser("classic-slot").password("classic-slot").roles("GAME");
+                        .withUser("classic-slot").password("classic-slot").roles("GAME")
+                ;
             }
         };
     }

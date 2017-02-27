@@ -33,12 +33,6 @@ public class WalletController implements DefaultApi, IdApi {
     }
 
     @Override
-    public ResponseEntity<Void> updateWallet(@PathVariable("id") Long id, @RequestBody wallet.app.definitions.Wallet wallet) {
-        repo.save(id, new Wallet());
-        return ResponseEntity.<Void>noContent().build();
-    }
-
-    @Override
     public ResponseEntity<wallet.app.definitions.Wallet> getWallet(@PathVariable("id") Long id) {
         Wallet model = repo.findOne(id);
         wallet.app.definitions.Wallet api = new wallet.app.definitions.Wallet();
