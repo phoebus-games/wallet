@@ -14,6 +14,7 @@ import java.io.InputStream;
 import java.util.Map;
 import java.util.Properties;
 
+@SuppressWarnings("WeakerAccess")
 @Module(
         library = true, injects = WalletRepo.class
 )
@@ -31,15 +32,20 @@ public class Config {
     @Singleton
     @Provides
     public Properties properties(Map<String, String> env) {
-        Properties properties = new Properties(System.getProperties());
+        Properties properties = new Properties();
+
+        properties.putAll(System.getProperties());
+
         try (InputStream in = Config.class.getResourceAsStream("/application.properties")) {
             properties.load(in);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
         env.forEach((k, v) -> {
             properties.put(k.replaceAll("_", ".").toLowerCase(), v);
         });
+
         return properties;
     }
 
