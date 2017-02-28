@@ -16,7 +16,7 @@ public class LiquibaseLoader {
     public LiquibaseLoader(DataSource dataSource) {
         try (Connection connection = dataSource.getConnection()) {
             Database database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(new JdbcConnection(connection));
-            Liquibase liquibase = new Liquibase("/db/changelog/db.changelog-master.yaml", new ClassLoaderResourceAccessor(), database);
+            Liquibase liquibase = new Liquibase("db/changelog/db.changelog-master.yaml", new ClassLoaderResourceAccessor(), database);
             liquibase.update("");
         } catch (SQLException | LiquibaseException e) {
             throw new RuntimeException(e);

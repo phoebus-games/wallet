@@ -31,7 +31,7 @@ public class WalletRepoImpl implements WalletRepo {
     @Override
     public void save(long id, Wallet wallet) throws SQLException {
         try (Connection connection = dataSource.getConnection()) {
-            try (PreparedStatement stmt = connection.prepareStatement("update wallet set balance = balance + ? where id = ?")) {
+            try (PreparedStatement stmt = connection.prepareStatement("update wallet set balance =  ? where id = ?")) {
                 stmt.setBigDecimal(1, wallet.getBalance());
                 stmt.setLong(2, id);
                 if (stmt.executeUpdate() != 1) {
