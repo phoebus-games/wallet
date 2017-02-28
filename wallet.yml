@@ -29,11 +29,11 @@ spec:
         env:
           #- name: JAVA_OPTS
           #  value: -Xmx64m
-          - name: SPRING_DATASOURCE_URL
+          - name: DATASOURCE_URL
             value: jdbc:postgresql://walletdb:5432/wallet
-          - name: SPRING_DATASOURCE_USERNAME
+          - name: DATASOURCE_USERNAME
             value: wallet
-          - name: SPRING_DATASOURCE_PASSWORD
+          - name: DATASOURCE_PASSWORD
             value: wallet
         ports:
         - containerPort: 8080
