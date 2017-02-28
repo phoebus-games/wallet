@@ -1,23 +1,21 @@
 package wallet.app;
 
+import com.sun.jersey.api.container.grizzly2.GrizzlyServerFactory;
 import io.restassured.RestAssured;
 import io.restassured.authentication.PreemptiveBasicAuthScheme;
+import org.glassfish.grizzly.http.server.HttpServer;
+import org.junit.After;
 import org.junit.Before;
-import org.junit.runner.RunWith;
-import org.springframework.boot.context.embedded.LocalServerPort;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringRunner;
-import wallet.Config;
+import wallet.App;
 
-import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
+import java.io.IOException;
 
-@RunWith(SpringRunner.class)
-@ContextConfiguration(classes = Config.class)
-@SpringBootTest(webEnvironment = RANDOM_PORT)
 abstract class IntegrationTest {
-    @LocalServerPort
-    private int port;
+    private final App app = new App();
+    private final HttpServer server = GrizzlyServerFactory.createHttpServer("http://localhost:8080", new App());
+
+    IntegrationTest() throws IOException {
+    }
 
     private static PreemptiveBasicAuthScheme auth() {
         PreemptiveBasicAuthScheme auth = new PreemptiveBasicAuthScheme();
@@ -29,8 +27,13 @@ abstract class IntegrationTest {
     @Before
     public void setUp() throws Exception {
         RestAssured.reset();
-        RestAssured.port = port;
         RestAssured.authentication = auth();
         RestAssured.enableLoggingOfRequestAndResponseIfValidationFails();
+        server.start();
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        server.stop();
     }
 }

@@ -1,43 +1,56 @@
 package wallet.infra;
 
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
-import org.springframework.stereotype.Repository;
 import wallet.model.Wallet;
 
-import java.math.BigDecimal;
+import javax.sql.DataSource;
+import java.sql.*;
 
-import static java.util.Collections.singletonMap;
-
-@Repository
 public class WalletRepo {
-    private final JdbcTemplate template;
 
-    public WalletRepo(JdbcTemplate template) {
-        this.template = template;
+    private final DataSource dataSource;
+
+    public WalletRepo(DataSource dataSource, LiquibaseLoader liquibaseLoader) {
+        this.dataSource = dataSource;
     }
 
-    public long create() {
-        return new SimpleJdbcInsert(template)
-                .withTableName("wallet")
-                .usingGeneratedKeyColumns("id")
-                .usingColumns("balance")
-                .executeAndReturnKey(singletonMap("balance", BigDecimal.ZERO))
-                .longValue();
-    }
-
-    public void save(long id, Wallet wallet) {
-        int numUpdated = template.update("update wallet set balance = ? where id = ?", wallet.getBalance(), id);
-        if (numUpdated != 1) {
-            throw new IllegalStateException();
+    public long create() throws SQLException {
+        try (Connection connection = dataSource.getConnection()) {
+            try (PreparedStatement stmt = connection.prepareStatement("insert into wallet(balance)values (0)", Statement.RETURN_GENERATED_KEYS)) {
+                stmt.executeUpdate();
+                try (ResultSet rs = stmt.getGeneratedKeys()) {
+                    rs.next();
+                    return rs.getLong(1);
+                }
+            }
         }
     }
 
-    public Wallet findOne(long id) {
-        return template.queryForObject("select balance from wallet where id = ?", new Object[]{id}, (rs, rowNum) -> {
-            Wallet wallet = new Wallet();
-            wallet.setBalance(rs.getBigDecimal("balance"));
-            return wallet;
-        });
+    public void save(long id, Wallet wallet) throws SQLException {
+        try (Connection connection = dataSource.getConnection()) {
+            try (PreparedStatement stmt = connection.prepareStatement("update wallet set balance = balance + ? where id = ?")) {
+                stmt.setBigDecimal(1, wallet.getBalance());
+                stmt.setLong(2, id);
+                if (stmt.executeUpdate() != 1) {
+                    throw new IllegalStateException();
+                }
+            }
+        } catch (SQLException e) {
+            if (e.getMessage().contains("chk_balance")) {
+                throw new NotEnoughFundsException();
+            }
+            throw e;
+        }
+    }
+
+    public Wallet findOne(long id) throws SQLException {
+        try (Connection connection = dataSource.getConnection()) {
+            try (PreparedStatement stmt = connection.prepareStatement("select balance from wallet where id = ?")) {
+                stmt.setLong(1, id);
+                try (ResultSet rs = stmt.executeQuery()) {
+                    rs.next();
+                    return new Wallet(rs.getBigDecimal("balance"));
+                }
+            }
+        }
     }
 }
