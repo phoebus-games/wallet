@@ -27,8 +27,8 @@ spec:
       - name: wallet
         image: alexec/wallet:latest
         env:
-          #- name: JAVA_OPTS
-          #  value: -Xmx64m
+          - name: JAVA_OPTS
+            value: -Xmx64m
           - name: DATASOURCE_URL
             value: jdbc:postgresql://walletdb:5432/wallet
           - name: DATASOURCE_USERNAME
@@ -41,5 +41,8 @@ spec:
           httpGet:
             path: /0
             port: 8080
-          initialDelaySeconds: 180
+            httpHeaders:
+            - name: Authorization
+              value: "Basic d2ViOndlYg=="
+          initialDelaySeconds: 15
           periodSeconds: 3
