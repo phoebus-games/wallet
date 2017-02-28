@@ -184,14 +184,4 @@
         <maven>3.2.1</maven>
     </prerequisites>
 
-    <profiles>
-        <profile>
-            <!-- work around an issue we using executable with failsafe plugin -->
-            <id>executable</id>
-            <properties>
-                <skipTests>true</skipTests>
-            </properties>
-        </profile>
-    </profiles>
-
 </project>

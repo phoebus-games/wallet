@@ -28,7 +28,7 @@ public class Config {
 
     @Provides
     public Properties properties(Map<String, String> env) {
-        Properties properties = new Properties();
+        Properties properties = new Properties(System.getProperties());
         try (InputStream in = Config.class.getResourceAsStream("/application.properties")) {
             properties.load(in);
         } catch (IOException e) {
