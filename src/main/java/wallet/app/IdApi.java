@@ -1,10 +1,10 @@
 package wallet.app;
 
 import wallet.app.definitions.Error;
-import wallet.infra.NotEnoughFundsException;
-import wallet.infra.WalletRepo;
+import wallet.model.NotEnoughFundsException;
 import wallet.model.Transaction;
 import wallet.model.Wallet;
+import wallet.model.WalletRepo;
 
 import javax.annotation.Resource;
 import javax.ws.rs.*;

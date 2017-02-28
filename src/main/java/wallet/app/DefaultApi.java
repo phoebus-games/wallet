@@ -1,7 +1,7 @@
 package wallet.app;
 
-import wallet.infra.WalletRepo;
 import wallet.model.Wallet;
+import wallet.model.WalletRepo;
 
 import javax.annotation.Resource;
 import javax.ws.rs.POST;

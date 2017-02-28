@@ -4,11 +4,13 @@ import dagger.Module;
 import dagger.Provides;
 import org.postgresql.ds.PGSimpleDataSource;
 import wallet.infra.LiquibaseLoader;
-import wallet.infra.WalletRepo;
+import wallet.infra.WalletRepoImpl;
+import wallet.model.WalletRepo;
 
 import javax.sql.DataSource;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Map;
 import java.util.Properties;
 
 @Module(
@@ -16,15 +18,23 @@ import java.util.Properties;
 )
 public class Config {
 
+    private static final String DATASOURCE_PASSWORD = "datasource.password";
+    private static final String DATASOURCE_USERNAME = "datasource.username";
+
     @Provides
-    public Properties properties() {
+    public Map<String, String> env() {
+        return System.getenv();
+    }
+
+    @Provides
+    public Properties properties(Map<String, String> env) {
         Properties properties = new Properties();
         try (InputStream in = Config.class.getResourceAsStream("/application.properties")) {
             properties.load(in);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        System.getenv().forEach((k, v) -> {
+        env.forEach((k, v) -> {
             properties.put(k.replaceAll("_", ".").toLowerCase(), v);
         });
         return properties;
@@ -34,11 +44,13 @@ public class Config {
     public DataSource dataSource(Properties properties) {
         PGSimpleDataSource ds = new PGSimpleDataSource();
         ds.setUrl(properties.getProperty("datasource.url"));
-        if (properties.contains("datasource.username")) {
-            ds.setUser("datasource.username");
+        String username = properties.getProperty(DATASOURCE_USERNAME);
+        if (username != null) {
+            ds.setUser(username);
         }
-        if (properties.contains("datasource.password")) {
-            ds.setUser("datasource.password§");
+        String password = properties.getProperty(DATASOURCE_PASSWORD);
+        if (password != null) {
+            ds.setPassword(password);
         }
         return ds;
     }
@@ -50,6 +62,6 @@ public class Config {
 
     @Provides
     public WalletRepo walletRepo(DataSource dataSource, LiquibaseLoader liquibaseLoader) {
-        return new WalletRepo(dataSource, liquibaseLoader);
+        return new WalletRepoImpl(dataSource, liquibaseLoader);
     }
 }

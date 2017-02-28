@@ -16,7 +16,7 @@ deployment:
   prod:
     branch: jersey
     commands:
-      - mvn package spring-boot:repackage -DskipTests
+      - mvn package -DskipTests
       - docker build --rm=false -t alexec/wallet:1.0.0 -t alexec/wallet:latest .
       - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
       - docker push alexec/wallet
