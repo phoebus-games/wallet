@@ -1,38 +1,59 @@
 package wallet;
 
-import com.sun.jersey.api.container.filter.LoggingFilter;
-import com.sun.jersey.api.container.grizzly2.GrizzlyServerFactory;
-import com.sun.jersey.api.core.DefaultResourceConfig;
+import dagger.ObjectGraph;
 import org.glassfish.grizzly.http.server.HttpServer;
+import org.glassfish.hk2.api.Factory;
+import org.glassfish.hk2.utilities.binding.AbstractBinder;
+import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
+import org.glassfish.jersey.server.ResourceConfig;
 import wallet.app.DefaultApi;
 import wallet.app.IdApi;
 import wallet.infra.AuthFilter;
-import wallet.infra.DaggerProvider;
+import wallet.model.WalletRepo;
 
-import java.io.IOException;
+import java.net.URI;
 
-public class App extends DefaultResourceConfig {
+public class App extends ResourceConfig {
+    private final ObjectGraph objectGraph = ObjectGraph.create(new Config());
+    private class DaggerFactory<T> implements Factory<T> {
+        private final Class<T> klass;
 
+        private DaggerFactory(Class<T> klass) {
+            this.klass = klass;
+        }
+
+        @Override
+        public T provide() {
+            return objectGraph.get(klass);
+        }
+
+        @Override
+        public void dispose(T instance) {
+
+        }
+    }
     public App() {
         super(
                 DefaultApi.class,
                 IdApi.class,
-                DaggerProvider.class
+                AuthFilter.class
         );
 
-        getFeatures().put("com.sun.jersey.api.json.POJOMappingFeature", true);
-        getProperties().put("com.sun.jersey.spi.container.ContainerRequestFilters",
-                LoggingFilter.class.getName() + ";" +
-                AuthFilter.class.getName());
-        getProperties().put("com.sun.jersey.spi.container.ContainerResponseFilters",
-                LoggingFilter.class.getName());
+        register(new AbstractBinder() {
+            @Override
+            protected void configure() {
+                bindFactory(new DaggerFactory<>(WalletRepo.class)).to(WalletRepo.class);
+            }
+        });
+
     }
 
-    public static void main(String[] args) throws IOException, InterruptedException {
-        HttpServer server = GrizzlyServerFactory.createHttpServer("http://0.0.0.0:" + System.getProperty("server.port", "8080"), new App());
+    public static void main(String[] args) throws Exception {
+        String url = "http://0.0.0.0:" + System.getProperty("server.port", "8080");
+        HttpServer server = GrizzlyHttpServerFactory.createHttpServer(URI.create(url), new App());
         server.start();
         Thread.currentThread().join();
-        server.stop();
+        server.shutdown();
 
     }
 }

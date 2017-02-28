@@ -1,12 +1,12 @@
 package wallet.infra;
 
-import com.sun.jersey.core.header.InBoundHeaders;
-import com.sun.jersey.server.impl.application.WebApplicationImpl;
-import com.sun.jersey.spi.container.ContainerRequest;
+import org.glassfish.jersey.internal.MapPropertiesDelegate;
+import org.glassfish.jersey.server.ContainerRequest;
 import org.junit.Test;
 
 import javax.ws.rs.WebApplicationException;
-
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.core.MultivaluedMap;
 import java.util.Collections;
 
 import static org.junit.Assert.assertEquals;
@@ -15,20 +15,20 @@ import static org.junit.Assert.fail;
 public class AuthFilterTest {
 
     private final AuthFilter authFilter = new AuthFilter();
-    private final InBoundHeaders headers = new InBoundHeaders();
-    private final ContainerRequest containerRequest = new ContainerRequest(new WebApplicationImpl(), "GET", null, null, headers, null);
+    private final ContainerRequestContext context = new ContainerRequest(null, null, "GET", null, new MapPropertiesDelegate());
+    private final MultivaluedMap<String, String> headers = context.getHeaders();
     private final String webBearer = "Basic d2ViOndlYg==";
     private final String webBearerBad = "Basic d2ViOmZvbw==";
     private final String rouletteBearer  = "Basic cm91bGV0dGU6cm91bGV0dGU=";
 
     @Test
     public void failsIfNoToken() throws Exception {
-        assertStatus(401, () -> authFilter.filter(containerRequest));
+        assertStatus(401, () -> authFilter.filter(context));
     }
     @Test
     public void failsIfBadToken() throws Exception {
         authorisation(webBearerBad);
-        assertStatus(401, () -> authFilter.filter(containerRequest));
+        assertStatus(401, () -> authFilter.filter(context));
     }
     private static void assertStatus(int status, Runnable block) {
         try {
@@ -42,13 +42,13 @@ public class AuthFilterTest {
     @Test(expected = Exception.class)
     public void failsIfGarbage() throws Exception {
         authorisation("");
-        authFilter.filter(containerRequest);
+        authFilter.filter(context);
     }
 
     @Test
     public void webCanGet() throws Exception {
         authorisation(webBearer);
-        authFilter.filter(containerRequest);
+        authFilter.filter(context);
     }
 
     private void authorisation(String bearer) {
@@ -59,45 +59,45 @@ public class AuthFilterTest {
     public void webCannotPost() throws Exception {
         post();
         authorisation(webBearer);
-        assertStatus(403, () -> authFilter.filter(containerRequest));
+        assertStatus(403, () -> authFilter.filter(context));
     }
 
     private void post() {
-        containerRequest.setMethod("POST");
+        context.setMethod("POST");
     }
 
     @Test
     public void webCannotPut() throws Exception {
         put();
         authorisation(webBearer);
-        assertStatus(403, () -> authFilter.filter(containerRequest));
+        assertStatus(403, () -> authFilter.filter(context));
     }
 
     private void put() {
-        containerRequest.setMethod("PUT");
+        context.setMethod("PUT");
     }
 
     @Test
     public void webCannotDelete() throws Exception {
         delete();
         authorisation(webBearer);
-        assertStatus(403, () -> authFilter.filter(containerRequest));
+        assertStatus(403, () -> authFilter.filter(context));
     }
 
     private void delete() {
-        containerRequest.setMethod("DELETE");
+        context.setMethod("DELETE");
     }
 
     @Test
     public void rouletteCanGet() throws Exception {
         authorisation(rouletteBearer);
-        authFilter.filter(containerRequest);
+        authFilter.filter(context);
     }
 
     @Test
     public void rouletteCanPost() throws Exception {
         post();
         authorisation(rouletteBearer);
-        authFilter.filter(containerRequest);
+        authFilter.filter(context);
     }
 }

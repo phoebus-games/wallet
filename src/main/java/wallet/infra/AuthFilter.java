@@ -1,9 +1,9 @@
 package wallet.infra;
 
-import com.sun.jersey.spi.container.ContainerRequest;
-import com.sun.jersey.spi.container.ContainerRequestFilter;
 
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.core.Response;
 import java.util.*;
 
@@ -25,12 +25,9 @@ public class AuthFilter implements ContainerRequestFilter {
     }
 
     @Override
-    public ContainerRequest filter(ContainerRequest containerRequest) throws WebApplicationException {
-
-        String username = authenticate(containerRequest);
-        authorize(username, containerRequest.getMethod());
-
-        return containerRequest;
+    public void filter(ContainerRequestContext context) {
+        String username = authenticate(context);
+        authorize(username, context.getMethod());
     }
 
     private static void authorize(String username, String method) {
@@ -58,8 +55,8 @@ public class AuthFilter implements ContainerRequestFilter {
         throw new WebApplicationException(Response.status(403).build());
     }
 
-    private static String authenticate(ContainerRequest containerRequest) {
-        String token = new String(Base64.getDecoder().decode(getBearerToken(containerRequest)));
+    private static String authenticate(ContainerRequestContext context) {
+        String token = new String(Base64.getDecoder().decode(getBearerToken(context)));
         String username = token.replaceFirst(":.*$", "");
         String password = token.replaceFirst("^.*:", "");
         if (!USERS.containsKey(username) || !USERS.get(username).equals(password)) {
@@ -68,14 +65,14 @@ public class AuthFilter implements ContainerRequestFilter {
         return username;
     }
 
-    private static String getBearerToken(ContainerRequest containerRequest) {
-        List<String> authorizations = containerRequest.getRequestHeader("Authorization");
+    private static String getBearerToken(ContainerRequestContext context) {
+        String authorization = context.getHeaderString("Authorization");
 
-        if (authorizations == null || authorizations.isEmpty()) {
+        if (authorization == null) {
             return unauthorised();
         }
 
-        return authorizations.get(0).replaceFirst("^Basic ", "");
+        return authorization.replaceFirst("^Basic ", "");
     }
 
 }

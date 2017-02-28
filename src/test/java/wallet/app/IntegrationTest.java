@@ -1,18 +1,18 @@
 package wallet.app;
 
-import com.sun.jersey.api.container.grizzly2.GrizzlyServerFactory;
 import io.restassured.RestAssured;
 import io.restassured.authentication.PreemptiveBasicAuthScheme;
 import org.glassfish.grizzly.http.server.HttpServer;
+import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.junit.After;
 import org.junit.Before;
 import wallet.App;
 
 import java.io.IOException;
+import java.net.URI;
 
 abstract class IntegrationTest {
-    private final App app = new App();
-    private final HttpServer server = GrizzlyServerFactory.createHttpServer("http://localhost:8080", new App());
+    private final HttpServer server = GrizzlyHttpServerFactory.createHttpServer(URI.create("http://localhost:8080"), new App());
 
     IntegrationTest() throws IOException {
     }
@@ -34,6 +34,6 @@ abstract class IntegrationTest {
 
     @After
     public void tearDown() throws Exception {
-        server.stop();
+        server.shutdown();
     }
 }

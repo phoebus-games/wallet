@@ -7,6 +7,7 @@ import wallet.infra.LiquibaseLoader;
 import wallet.infra.WalletRepoImpl;
 import wallet.model.WalletRepo;
 
+import javax.inject.Singleton;
 import javax.sql.DataSource;
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,11 +22,13 @@ public class Config {
     private static final String DATASOURCE_PASSWORD = "datasource.password";
     private static final String DATASOURCE_USERNAME = "datasource.username";
 
+    @Singleton
     @Provides
     public Map<String, String> env() {
         return System.getenv();
     }
 
+    @Singleton
     @Provides
     public Properties properties(Map<String, String> env) {
         Properties properties = new Properties(System.getProperties());
@@ -40,6 +43,7 @@ public class Config {
         return properties;
     }
 
+    @Singleton
     @Provides
     public DataSource dataSource(Properties properties) {
         PGSimpleDataSource ds = new PGSimpleDataSource();
@@ -55,6 +59,7 @@ public class Config {
         return ds;
     }
 
+    @Singleton
     @Provides
     public LiquibaseLoader liquibaseLoader(DataSource dataSource) {
         return new LiquibaseLoader(dataSource);

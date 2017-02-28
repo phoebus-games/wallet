@@ -3,7 +3,7 @@ package wallet.app;
 import wallet.model.Wallet;
 import wallet.model.WalletRepo;
 
-import javax.annotation.Resource;
+import javax.inject.Inject;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -16,8 +16,8 @@ import java.sql.SQLException;
 @Path("/")
 public class DefaultApi {
 
-    @Resource
-    private WalletRepo repo;
+    @Inject
+    public WalletRepo repo;
 
     @POST
     @Produces({"application/json"})
