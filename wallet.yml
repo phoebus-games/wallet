@@ -47,7 +47,7 @@ spec:
             - name: Authorization
               value: "Basic d2ViOndlYg=="
           initialDelaySeconds: 15
-          periodSeconds: 3
+          periodSeconds: 15
         livenessProbe:
           httpGet:
             path: /0
@@ -58,4 +58,4 @@ spec:
             - name: Authorization
               value: "Basic d2ViOndlYg=="
           initialDelaySeconds: 15
-          periodSeconds: 3
+          periodSeconds: 15
