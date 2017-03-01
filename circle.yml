@@ -17,8 +17,8 @@ deployment:
     branch: jersey
     commands:
       - mvn package -DskipTests
-      - docker build --rm=false -t alexec/wallet:1.0.0 -t alexec/wallet:latest .
+      - docker build --rm=false -t alexec/wallet:$CIRCLE_BUILD_NUM -t alexec/wallet:latest .
       - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
       - docker push alexec/wallet
-      - ./deploy.sh
+      - kubectl replace --force -f wallet.yml
       - "curl -f -u $CIRCLE_TOKEN: -X POST https://circleci.com/api/v1.1/project/github/phoebus-games/smoke/tree/master"
