@@ -21,15 +21,6 @@ public class AuthFilterTest {
     private final String webBearerBad = "Basic d2ViOmZvbw==";
     private final String rouletteBearer  = "Basic cm91bGV0dGU6cm91bGV0dGU=";
 
-    @Test
-    public void failsIfNoToken() throws Exception {
-        assertStatus(401, () -> authFilter.filter(context));
-    }
-    @Test
-    public void failsIfBadToken() throws Exception {
-        authorisation(webBearerBad);
-        assertStatus(401, () -> authFilter.filter(context));
-    }
     private static void assertStatus(int status, Runnable block) {
         try {
             block.run();
@@ -37,6 +28,27 @@ public class AuthFilterTest {
         } catch (WebApplicationException e) {
             assertEquals(status, e.getResponse().getStatus());
         }
+    }
+
+    @Test
+    public void returnWwwAuthenticateHeader() throws Exception {
+        try {
+            authFilter.filter(context);
+            fail();
+        } catch (WebApplicationException e) {
+            assertEquals("Basic", e.getResponse().getHeaderString("WWW-Authenticate"));
+        }
+    }
+
+    @Test
+    public void failsIfNoToken() throws Exception {
+        assertStatus(401, () -> authFilter.filter(context));
+    }
+
+    @Test
+    public void failsIfBadToken() throws Exception {
+        authorisation(webBearerBad);
+        assertStatus(401, () -> authFilter.filter(context));
     }
 
     @Test(expected = Exception.class)

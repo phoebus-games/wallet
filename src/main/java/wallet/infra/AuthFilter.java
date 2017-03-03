@@ -9,6 +9,7 @@ import java.util.*;
 
 public class AuthFilter implements ContainerRequestFilter {
     private static final Map<String, List<String>> ROLES = new HashMap<>();
+    private static final Map<String, String> USERS = new HashMap<>();
 
     static {
         ROLES.put("web", Collections.singletonList("WEB"));
@@ -16,18 +17,10 @@ public class AuthFilter implements ContainerRequestFilter {
         ROLES.put("classic-slot", Collections.singletonList("GAME"));
     }
 
-    private static final Map<String, String> USERS = new HashMap<>();
-
     static {
         USERS.put("web", "web");
         USERS.put("roulette", "roulette");
         USERS.put("classic-slot", "classic-slot");
-    }
-
-    @Override
-    public void filter(ContainerRequestContext context) {
-        String username = authenticate(context);
-        authorize(username, context.getMethod());
     }
 
     private static void authorize(String username, String method) {
@@ -48,7 +41,7 @@ public class AuthFilter implements ContainerRequestFilter {
     }
 
     private static String unauthorised() {
-        throw new WebApplicationException(Response.status(401).build());
+        throw new WebApplicationException(Response.status(401).header("WWW-Authenticate", "Basic").build());
     }
 
     private static void forbidden() {
@@ -73,6 +66,12 @@ public class AuthFilter implements ContainerRequestFilter {
         }
 
         return authorization.replaceFirst("^Basic ", "");
+    }
+
+    @Override
+    public void filter(ContainerRequestContext context) {
+        String username = authenticate(context);
+        authorize(username, context.getMethod());
     }
 
 }
