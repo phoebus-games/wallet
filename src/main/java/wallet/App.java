@@ -1,6 +1,5 @@
 package wallet;
 
-import dagger.ObjectGraph;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.hk2.api.Factory;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
@@ -9,29 +8,17 @@ import org.glassfish.jersey.server.ResourceConfig;
 import wallet.app.DefaultApi;
 import wallet.app.IdApi;
 import wallet.infra.AuthFilter;
+import wallet.infra.LiquibaseLoader;
+import wallet.infra.WalletRepoImpl;
 import wallet.model.WalletRepo;
 
+import javax.sql.DataSource;
 import java.net.URI;
+import java.util.Map;
+import java.util.Properties;
 
 public class App extends ResourceConfig {
-    private final ObjectGraph objectGraph = ObjectGraph.create(new Config());
-    private class DaggerFactory<T> implements Factory<T> {
-        private final Class<T> klass;
 
-        private DaggerFactory(Class<T> klass) {
-            this.klass = klass;
-        }
-
-        @Override
-        public T provide() {
-            return objectGraph.get(klass);
-        }
-
-        @Override
-        public void dispose(T instance) {
-
-        }
-    }
     public App() {
         super(
                 DefaultApi.class,
@@ -42,7 +29,23 @@ public class App extends ResourceConfig {
         register(new AbstractBinder() {
             @Override
             protected void configure() {
-                bindFactory(new DaggerFactory<>(WalletRepo.class)).to(WalletRepo.class);
+                bindFactory(new Factory<WalletRepo>() {
+                    private final Config config = new Config();
+                    private final Map<String, String> env = config.env();
+                    private final Properties properties = config.properties(env);
+                    private final DataSource dataSource = config.dataSource(properties);
+                    private final LiquibaseLoader liquibaseLoader = new LiquibaseLoader(dataSource);
+
+                    @Override
+                    public WalletRepo provide() {
+                        return new WalletRepoImpl(dataSource, liquibaseLoader);
+                    }
+
+                    @Override
+                    public void dispose(WalletRepo walletRepo) {
+
+                    }
+                }).to(WalletRepo.class);
             }
         });
 
