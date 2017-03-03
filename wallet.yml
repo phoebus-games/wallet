@@ -26,9 +26,10 @@ spec:
       containers:
       - name: wallet
         image: alexec/wallet:latest
+        imagePullPolicy: Always
         env:
-          #- name: JAVA_OPTS
-          #  value: -Xmx64m
+          - name: JAVA_OPTS
+            value: -Xmx256m
           - name: DATASOURCE_URL
             value: jdbc:postgresql://walletdb:5432/wallet
           - name: DATASOURCE_USERNAME
