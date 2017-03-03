@@ -14,7 +14,7 @@ test:
     - find . -type f -regex ".*/target/failsafe-reports/.*xml" -exec cp {} $CIRCLE_TEST_REPORTS/junit/ \;
 deployment:
   prod:
-    branch: master|jersey
+    branch: master
     commands:
       - mvn package -DskipTests
       - docker build --rm=false -t alexec/wallet:$CIRCLE_BUILD_NUM -t alexec/wallet:latest .
