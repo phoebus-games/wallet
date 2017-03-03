@@ -4,17 +4,22 @@ import io.restassured.http.ContentType;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.IOException;
+
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.core.IsEqual.equalTo;
 
 public class WalletControllerIT extends IntegrationTest {
-    private long id;
+    private String wallet;
+
+    public WalletControllerIT() throws IOException {
+    }
 
     @Override
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        id = Long.parseLong(given()
+        wallet = given()
                 .contentType(ContentType.JSON)
                 .when()
                 .post()
@@ -22,17 +27,17 @@ public class WalletControllerIT extends IntegrationTest {
                 .statusCode(201)
                 .body("balance", equalTo(0))
                 .extract()
-                .header("Location"));
+                .header("Location");
     }
 
     @Test
     public void webCannotCreateTransaction() throws Exception {
         given()
-                .auth().basic("web", "web")
+                .auth().preemptive().basic("web", "web")
                 .contentType(ContentType.JSON)
                 .body("{\"amount\": 200}")
                 .when()
-                .post("/" + id + "/transactions")
+                .post(wallet + "/transactions")
                 .then()
                 .statusCode(403);
     }
@@ -40,20 +45,18 @@ public class WalletControllerIT extends IntegrationTest {
     @Test
     public void webCanGetWallet() throws Exception {
         given()
-                .auth().basic("web", "web")
+                .auth().preemptive().basic("web", "web")
                 .when()
-                .get("/" + id)
+                .get(wallet)
                 .then()
                 .statusCode(200);
     }
-
-    // TODO block access without basic
 
     @Test
     public void canGetWallet() throws Exception {
         given()
                 .when()
-                .get("/" + id)
+                .get(wallet)
                 .then()
                 .statusCode(200)
                 .body("balance", equalTo(0.0f));
@@ -65,9 +68,16 @@ public class WalletControllerIT extends IntegrationTest {
                 .contentType(ContentType.JSON)
                 .body("{\"amount\": 200}")
                 .when()
-                .post("/" + id + "/transactions")
+                .post(wallet + "/transactions")
                 .then()
                 .statusCode(201)
+                .body("balance", equalTo(200.0f));
+
+        given()
+                .when()
+                .get(wallet)
+                .then()
+                .statusCode(200)
                 .body("balance", equalTo(200.0f));
     }
 
@@ -77,7 +87,7 @@ public class WalletControllerIT extends IntegrationTest {
                 .contentType(ContentType.JSON)
                 .body("{\"amount\": -200}")
                 .when()
-                .post("/" + id + "/transactions")
+                .post(wallet + "/transactions")
                 .then()
                 .statusCode(403)
                 .body("message", equalTo("not enough funds"));

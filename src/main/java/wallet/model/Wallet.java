@@ -1,14 +1,18 @@
 package wallet.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class Wallet {
-    private BigDecimal balance = BigDecimal.ZERO;
+    private BigDecimal balance;
 
-    public void incrementBalance(BigDecimal amount) {
+    public void updateBalance(BigDecimal amount) {
         balance = balance.add(amount);
     }
 }

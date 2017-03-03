@@ -1,78 +1,78 @@
 package wallet;
 
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.context.PropertyPlaceholderAutoConfiguration;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
-import org.springframework.boot.autoconfigure.liquibase.LiquibaseAutoConfiguration;
-import org.springframework.boot.autoconfigure.security.SecurityFilterAutoConfiguration;
-import org.springframework.boot.autoconfigure.web.*;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
-import org.springframework.http.HttpMethod;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import wallet.app.WalletController;
-import wallet.infra.WalletRepo;
+import dagger.Module;
+import dagger.Provides;
+import org.postgresql.ds.PGSimpleDataSource;
+import wallet.infra.LiquibaseLoader;
+import wallet.infra.WalletRepoImpl;
+import wallet.model.WalletRepo;
 
-@Configuration
-@EnableAutoConfiguration
-@Import({
-        DispatcherServletAutoConfiguration.class,
-        EmbeddedServletContainerAutoConfiguration.class,
-        ErrorMvcAutoConfiguration.class,
-        HttpEncodingAutoConfiguration.class,
-        HttpMessageConvertersAutoConfiguration.class,
-        JacksonAutoConfiguration.class,
-        ServerPropertiesAutoConfiguration.class,
-        PropertyPlaceholderAutoConfiguration.class,
-        WebMvcAutoConfiguration.class,
-        DataSourceAutoConfiguration.class,
-        LiquibaseAutoConfiguration.class,
-        SecurityFilterAutoConfiguration.class
-})
+import javax.inject.Singleton;
+import javax.sql.DataSource;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Map;
+import java.util.Properties;
+
+@SuppressWarnings("WeakerAccess")
+@Module(
+        library = true, injects = WalletRepo.class
+)
 public class Config {
 
-    @Bean
-    public WalletRepo walletRepo(JdbcTemplate template) {
-        return new WalletRepo(template);
+    private static final String DATASOURCE_PASSWORD = "datasource.password";
+    private static final String DATASOURCE_USERNAME = "datasource.username";
+
+    @Singleton
+    @Provides
+    public Map<String, String> env() {
+        return System.getenv();
     }
 
-    @Bean
-    public WalletController walletController(WalletRepo repo) {
-        return new WalletController(repo);
+    @Singleton
+    @Provides
+    public Properties properties(Map<String, String> env) {
+        Properties properties = new Properties();
+
+        properties.putAll(System.getProperties());
+
+        try (InputStream in = Config.class.getResourceAsStream("/application.properties")) {
+            properties.load(in);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        env.forEach((k, v) -> {
+            properties.put(k.replaceAll("_", ".").toLowerCase(), v);
+        });
+
+        return properties;
     }
 
-    @Bean
-    public WebSecurityConfigurerAdapter webSecurityConfigurerAdapter() {
-        return new WebSecurityConfigurerAdapter() {
+    @Singleton
+    @Provides
+    public DataSource dataSource(Properties properties) {
+        PGSimpleDataSource ds = new PGSimpleDataSource();
+        ds.setUrl(properties.getProperty("datasource.url"));
+        String username = properties.getProperty(DATASOURCE_USERNAME);
+        if (username != null) {
+            ds.setUser(username);
+        }
+        String password = properties.getProperty(DATASOURCE_PASSWORD);
+        if (password != null) {
+            ds.setPassword(password);
+        }
+        return ds;
+    }
 
-            @Override
-            protected void configure(HttpSecurity http) throws Exception {
-                http.cors().disable();
-                http.csrf().disable();
+    @Singleton
+    @Provides
+    public LiquibaseLoader liquibaseLoader(DataSource dataSource) {
+        return new LiquibaseLoader(dataSource);
+    }
 
-                http.httpBasic();
-
-                http.authorizeRequests()
-                        .antMatchers(HttpMethod.GET).hasAnyRole("WEB", "GAME")
-                        .antMatchers(HttpMethod.POST).hasRole("GAME")
-
-                ;
-            }
-
-            @Override
-            protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-                auth
-                        .inMemoryAuthentication()
-                        .withUser("web").password("web").roles("WEB").and()
-                        .withUser("roulette").password("roulette").roles("GAME").and()
-                        .withUser("classic-slot").password("classic-slot").roles("GAME")
-                ;
-            }
-        };
+    @Provides
+    public WalletRepo walletRepo(DataSource dataSource, LiquibaseLoader liquibaseLoader) {
+        return new WalletRepoImpl(dataSource, liquibaseLoader);
     }
 }
