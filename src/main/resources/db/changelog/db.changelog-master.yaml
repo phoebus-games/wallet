@@ -25,13 +25,6 @@ databaseChangeLog:
       changes:
         - sql:
             sql: insert into wallet (id) values (0)
-  # TODO - delete this
-  - changeSet:
-      id: 3
-      author: alex.e.c
-      changes:
-        - sql:
-            sql: update wallet set balance = 0 where balance < 0
   - changeSet:
       id: 4
       author: alex.e.c
