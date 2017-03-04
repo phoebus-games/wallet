@@ -1,6 +1,8 @@
 package wallet.infra;
 
 
+import wallet.app.definitions.Error;
+
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
@@ -41,11 +43,11 @@ public class AuthFilter implements ContainerRequestFilter {
     }
 
     private static String unauthorised() {
-        throw new WebApplicationException(Response.status(401).header("WWW-Authenticate", "Basic").build());
+        throw new WebApplicationException(Response.status(401).header("WWW-Authenticate", "Basic").header("Content-Type", "application/json").entity(new Error("unauthorized")).build());
     }
 
     private static void forbidden() {
-        throw new WebApplicationException(Response.status(403).build());
+        throw new WebApplicationException(Response.status(403).header("Content-Type", "application/json").entity(new Error("forbidden")).build());
     }
 
     private static String authenticate(ContainerRequestContext context) {

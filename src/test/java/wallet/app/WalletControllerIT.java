@@ -25,6 +25,7 @@ public class WalletControllerIT extends IntegrationTest {
                 .post()
                 .then()
                 .statusCode(201)
+                .header("Content-Type", "application/json")
                 .body("balance", equalTo(0))
                 .extract()
                 .header("Location");
@@ -39,6 +40,7 @@ public class WalletControllerIT extends IntegrationTest {
                 .when()
                 .post(wallet + "/transactions")
                 .then()
+                .header("Content-Type", "application/json")
                 .statusCode(403);
     }
 
@@ -59,6 +61,7 @@ public class WalletControllerIT extends IntegrationTest {
                 .get(wallet)
                 .then()
                 .statusCode(200)
+                .header("Content-Type", "application/json")
                 .body("balance", equalTo(0.0f));
     }
 
@@ -71,6 +74,7 @@ public class WalletControllerIT extends IntegrationTest {
                 .post(wallet + "/transactions")
                 .then()
                 .statusCode(201)
+                .header("Content-Type", "application/json")
                 .body("balance", equalTo(200.0f));
 
         given()
@@ -78,6 +82,7 @@ public class WalletControllerIT extends IntegrationTest {
                 .get(wallet)
                 .then()
                 .statusCode(200)
+                .header("Content-Type", "application/json")
                 .body("balance", equalTo(200.0f));
     }
 
@@ -90,6 +95,7 @@ public class WalletControllerIT extends IntegrationTest {
                 .post(wallet + "/transactions")
                 .then()
                 .statusCode(403)
+                .header("Content-Type", "application/json")
                 .body("message", equalTo("not enough funds"));
     }
 }
