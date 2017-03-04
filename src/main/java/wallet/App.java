@@ -7,9 +7,7 @@ import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 import wallet.app.DefaultApi;
 import wallet.app.IdApi;
-import wallet.infra.AuthFilter;
-import wallet.infra.LiquibaseLoader;
-import wallet.infra.WalletRepoImpl;
+import wallet.infra.*;
 import wallet.model.WalletRepo;
 
 import javax.sql.DataSource;
@@ -23,7 +21,10 @@ public class App extends ResourceConfig {
         super(
                 DefaultApi.class,
                 IdApi.class,
-                AuthFilter.class
+                AuthFilter.class,
+                ExceptionMapper.class,
+                IllegalArgumentExceptionMapper.class,
+                NotEnoughFundsExceptionMapper.class
         );
 
         register(new AbstractBinder() {

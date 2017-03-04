@@ -31,3 +31,40 @@ databaseChangeLog:
       changes:
         - sql:
             sql: alter table wallet add constraint chk_balance check(balance >= 0)
+  - changeSet:
+      id: 5
+      author: alex.e.c
+      changes:
+        - createTable:
+            tableName: transaction
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: wallet_id
+                  type: bigint
+                  constraints:
+                    foreignKeyName: fk_wallet
+                    references: wallet(id)
+                    nullable: false
+              - column:
+                  name: category
+                  type: char(8)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: amount
+                  type: decimal(12,4)
+                  constraints:
+                    nullable: false
+  - changeSet:
+      id: 6
+      author: alex.e.c
+      changes:
+        - sql:
+            sql: alter table transaction add constraint chk_category check(category in ('WAGER', 'PAYOUT'))

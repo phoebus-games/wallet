@@ -69,7 +69,7 @@ public class WalletControllerIT extends IntegrationTest {
     public void createTransaction() throws Exception {
         given()
                 .contentType(ContentType.JSON)
-                .body("{\"amount\": 200}")
+                .body("{\"amount\": 200, \"category\": \"WAGER\"}")
                 .when()
                 .post(wallet + "/transactions")
                 .then()
@@ -87,10 +87,61 @@ public class WalletControllerIT extends IntegrationTest {
     }
 
     @Test
-    public void cannotHaveBalanceBelowZero() throws Exception {
+    public void mustHaveAmount() throws Exception {
+        given()
+                .contentType(ContentType.JSON)
+                .body("{\"category\": \"WAGER\"}")
+                .when()
+                .post(wallet + "/transactions")
+                .then()
+                .statusCode(400)
+                .header("Content-Type", "application/json")
+                .body("message", equalTo("missing amount"));
+    }
+
+    @Test
+    public void mustHaveValidAmount() throws Exception {
+        given()
+                .contentType(ContentType.JSON)
+                .body("{\"amount\": 0.001, \"category\": \"WAGER\"}")
+                .when()
+                .post(wallet + "/transactions")
+                .then()
+                .statusCode(400)
+                .header("Content-Type", "application/json")
+                .body("message", equalTo("invalid amount"));
+    }
+
+    @Test
+    public void mustHaveCategory() throws Exception {
         given()
                 .contentType(ContentType.JSON)
                 .body("{\"amount\": -200}")
+                .when()
+                .post(wallet + "/transactions")
+                .then()
+                .statusCode(400)
+                .header("Content-Type", "application/json")
+                .body("message", equalTo("missing category"));
+    }
+
+    @Test
+    public void mustHaveValidCategory() throws Exception {
+        given()
+                .contentType(ContentType.JSON)
+                .body("{\"amount\": -200, \"category\": \"XXX\"}")
+                .when()
+                .post(wallet + "/transactions")
+                .then()
+                .statusCode(400);
+        // shame we can't enforce the other normal constraints
+    }
+
+    @Test
+    public void cannotHaveBalanceBelowZero() throws Exception {
+        given()
+                .contentType(ContentType.JSON)
+                .body("{\"amount\": -200, \"category\": \"PAYOUT\"}")
                 .when()
                 .post(wallet + "/transactions")
                 .then()

@@ -96,5 +96,10 @@ definitions:
       amount:
         type: number
         multipleOf: 0.01
+      category:
+        type: string
+        enum:
+        - WAGER
+        - PAYOUT
     required:
     - amount

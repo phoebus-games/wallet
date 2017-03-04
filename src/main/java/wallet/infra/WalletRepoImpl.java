@@ -1,6 +1,7 @@
 package wallet.infra;
 
 import wallet.model.NotEnoughFundsException;
+import wallet.model.Transaction;
 import wallet.model.Wallet;
 import wallet.model.WalletRepo;
 
@@ -29,20 +30,41 @@ public class WalletRepoImpl implements WalletRepo {
     }
 
     @Override
-    public void save(long id, Wallet wallet) throws SQLException {
+    public void createTransaction(long walletId, Transaction transaction) throws SQLException {
+        if (transaction.getAmount() == null) {
+            throw new IllegalArgumentException("missing amount");
+        }
+        if (transaction.getCategory() == null) {
+            throw new IllegalArgumentException("missing category");
+        }
+        if (transaction.getAmount().stripTrailingZeros().scale() > 2) {
+            throw new IllegalArgumentException("invalid amount");
+        }
         try (Connection connection = dataSource.getConnection()) {
-            try (PreparedStatement stmt = connection.prepareStatement("update wallet set balance =  ? where id = ?")) {
-                stmt.setBigDecimal(1, wallet.getBalance());
-                stmt.setLong(2, id);
+            connection.setAutoCommit(false);
+            try (PreparedStatement stmt = connection.prepareStatement("insert into transaction(wallet_id, category, amount) values (?,?,?)")) {
+                stmt.setLong(1, walletId);
+                stmt.setString(2, transaction.getCategory().name());
+                stmt.setBigDecimal(3, transaction.getAmount());
                 if (stmt.executeUpdate() != 1) {
                     throw new IllegalStateException();
                 }
             }
-        } catch (SQLException e) {
-            if (e.getMessage().contains("chk_balance")) {
-                throw new NotEnoughFundsException();
+            try (PreparedStatement stmt = connection.prepareStatement("update wallet set balance = balance +  ? where id = ?")) {
+                stmt.setBigDecimal(1, transaction.getAmount());
+                stmt.setLong(2, walletId);
+                if (stmt.executeUpdate() != 1) {
+                    throw new IllegalStateException();
+                }
+
+                connection.commit();
+            } catch (SQLException e) {
+                connection.rollback();
+                if (e.getMessage().contains("chk_balance")) {
+                    throw new NotEnoughFundsException();
+                }
+                throw e;
             }
-            throw e;
         }
     }
 
