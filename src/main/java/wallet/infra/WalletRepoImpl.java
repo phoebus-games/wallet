@@ -61,7 +61,7 @@ public class WalletRepoImpl implements WalletRepo {
             } catch (SQLException e) {
                 connection.rollback();
                 if (e.getMessage().contains("chk_balance")) {
-                    throw new NotEnoughFundsException();
+                    throw new NotEnoughFundsException("not enough funds");
                 }
                 throw e;
             }

@@ -7,7 +7,7 @@ securityDefinitions:
   basicAuth:
     type: basic
 paths:
-  /:
+  /wallets:
     post:
       summary: Create a new wallet
       operationId: createWallet
@@ -24,7 +24,7 @@ paths:
               description: Wallet location
           schema:
             $ref: "#/definitions/wallet"
-  /{id}:
+  /wallets/{id}:
     parameters:
     - name: id
       in: path
@@ -43,7 +43,7 @@ paths:
           description: OK
           schema:
             $ref: "#/definitions/wallet"
-  /{id}/transactions:
+  /wallets/{id}/transactions:
     parameters:
     - name: id
       in: path

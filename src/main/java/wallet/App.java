@@ -5,8 +5,7 @@ import org.glassfish.hk2.api.Factory;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
-import wallet.app.DefaultApi;
-import wallet.app.IdApi;
+import wallet.app.WalletsApi;
 import wallet.infra.*;
 import wallet.model.WalletRepo;
 
@@ -19,8 +18,7 @@ public class App extends ResourceConfig {
 
     public App() {
         super(
-                DefaultApi.class,
-                IdApi.class,
+                WalletsApi.class,
                 AuthFilter.class,
                 ExceptionMapper.class,
                 IllegalArgumentExceptionMapper.class,

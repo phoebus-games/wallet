@@ -9,10 +9,10 @@ import java.io.IOException;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.core.IsEqual.equalTo;
 
-public class WalletControllerIT extends IntegrationTest {
+public class WalletsApiIT extends IntegrationTest {
     private String wallet;
 
-    public WalletControllerIT() throws IOException {
+    public WalletsApiIT() throws IOException {
     }
 
     @Override
@@ -22,7 +22,7 @@ public class WalletControllerIT extends IntegrationTest {
         wallet = given()
                 .contentType(ContentType.JSON)
                 .when()
-                .post()
+                .post("/wallets")
                 .then()
                 .statusCode(201)
                 .header("Content-Type", "application/json")
