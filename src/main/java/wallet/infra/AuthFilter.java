@@ -15,12 +15,14 @@ public class AuthFilter implements ContainerRequestFilter {
 
     static {
         ROLES.put("web", Collections.singletonList("WEB"));
+        ROLES.put("router", Collections.singletonList("ROUTER"));
         ROLES.put("roulette", Collections.singletonList("GAME"));
         ROLES.put("classic-slot", Collections.singletonList("GAME"));
     }
 
     static {
         USERS.put("web", "web");
+        USERS.put("router", "router");
         USERS.put("roulette", "roulette");
         USERS.put("classic-slot", "classic-slot");
     }
@@ -30,7 +32,7 @@ public class AuthFilter implements ContainerRequestFilter {
 
         switch (method) {
             case "GET":
-                if (!userRoles.contains("WEB") && !userRoles.contains("GAME")) {
+                if (!userRoles.contains("ROUTER") && !userRoles.contains("WEB") && !userRoles.contains("GAME")) {
                     forbidden();
                 }
                 break;
