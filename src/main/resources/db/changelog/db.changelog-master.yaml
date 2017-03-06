@@ -68,3 +68,11 @@ databaseChangeLog:
       changes:
         - sql:
             sql: alter table transaction add constraint chk_category check(category in ('WAGER', 'PAYOUT'))
+  - changeSet:
+      id: 7
+      author: alex.e.c
+      changes:
+        - sql:
+            sql: |
+              alter table transaction drop constraint chk_category;
+              alter table transaction add constraint chk_category check(category in ('WAGER', 'PAYOUT', 'CREDIT'));
