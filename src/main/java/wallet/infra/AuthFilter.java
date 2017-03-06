@@ -37,7 +37,7 @@ public class AuthFilter implements ContainerRequestFilter {
                 }
                 break;
             default:
-                if (!userRoles.contains("GAME")) {
+                if (!userRoles.contains("ROUTER") && !userRoles.contains("GAME")) {
                     forbidden();
                 }
                 break;
