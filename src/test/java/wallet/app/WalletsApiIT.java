@@ -55,19 +55,6 @@ public class WalletsApiIT extends IntegrationTest {
     }
 
     @Test
-    public void routerCannotCreateTransaction() throws Exception {
-        given()
-                .auth().preemptive().basic("router", "router")
-                .contentType(ContentType.JSON)
-                .body("{\"amount\": 200}")
-                .when()
-                .post(wallet + "/transactions")
-                .then()
-                .header("Content-Type", "application/json")
-                .statusCode(403);
-    }
-
-    @Test
     public void routerCanGetWallet() throws Exception {
         given()
                 .auth().preemptive().basic("router", "router")
@@ -76,6 +63,7 @@ public class WalletsApiIT extends IntegrationTest {
                 .then()
                 .statusCode(200);
     }
+
     @Test
     public void canGetWallet() throws Exception {
         given()

@@ -21,6 +21,7 @@ public class AuthFilterTest {
     private final String webBearer = "Basic d2ViOndlYg==";
     private final String webBearerBad = "Basic d2ViOmZvbw==";
     private final String rouletteBearer  = "Basic cm91bGV0dGU6cm91bGV0dGU=";
+    private final String routerBearer = "Basic cm91dGVyOnJvdXRlcg==";
 
     private static void assertStatus(int status, Runnable block, String message) {
         try {
@@ -115,6 +116,13 @@ public class AuthFilterTest {
     public void rouletteCanPost() throws Exception {
         post();
         authorisation(rouletteBearer);
+        authFilter.filter(context);
+    }
+
+    @Test
+    public void routerCanPost() throws Exception {
+        post();
+        authorisation(routerBearer);
         authFilter.filter(context);
     }
 }
