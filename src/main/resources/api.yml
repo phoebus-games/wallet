@@ -101,5 +101,6 @@ definitions:
         enum:
         - WAGER
         - PAYOUT
+        - CREDIT
     required:
     - amount
